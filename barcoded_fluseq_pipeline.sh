@@ -49,7 +49,7 @@ mkdir -p $sample_path
 echo "[INFO 2]: Copying sample files into sample directory."
 for i in `ls ${PWD}/$prefix*`;
 do
-	test -f $i && echo ...$i && cp $i $sample_path/
+	test -f $i && echo -e "\t... $i" && cp $i $sample_path/
 done
 
 echo "[INFO 3]: Checking sample directory for read files."
@@ -58,11 +58,15 @@ cd $sample_path
 ##Get fastq read files
 read1="_R1_001.fastq.gz"
 read2="_R2_001.fastq.gz"
+r1="_R1"
+r2="_R2"
+qc1=".qc.f.fq.gz"
+qc2=".qc.r.fq.gz"
 
 if [ -f $prefix$read1 ]; then
-	echo "... Found read1 '$prefix$read1'"
+	echo -e "\t... Found read1 '$prefix$read1'"
 	if [ -f $prefix$read2 ]; then
-		echo "... Found read2 '$prefix$read2'"
+		echo -e "\t... Found read2 '$prefix$read2'"
 	else
 		echo "[ERROR]: Read2 '$prefix$read2' not found."
 	fi
@@ -71,20 +75,40 @@ else
 	exit 1
 fi
 
+##Initial quality check
+echo "[INFO 4]: Initial quality check of reads using QUASR."
+java -jar $quasr_path -i $prefix$read1 -o $prefix$r1 -g -w 300 -R $r_path
+java -jar $quasr_path -i $prefix$read2 -o $prefix$r2 -g -w 300 -R $r_path 
+
+##Run QC on individual fastq
+length=275
+quality=20
+echo "[INFO 5]: Performing quality control using QUASR with -l $length -m $quality options:"
+java -jar $quasr_path -i $prefix$read1 -r $prefix$read2 -o $prefix -q -l $length -m $quality -z -g -w 300 -R $r_path 
+
+##Check if QC worked
+if [ -s $prefix$qc2 ]; then
+	echo -e '\t... QC reads found.'
+else
+	echo "[ERROR]: QC output file is empty/not found. Problem with QC occurred."
+	exit 1
+fi
+
 ##Pair fastq files
-echo '[INFO 4]: Pairing read files using PEAR.'
-$pear_path -f $prefix$read1 -r $prefix$read2 -o $prefix
+echo "[INFO 6]: Pairing read files using PEAR."
+$pear_path -f $prefix$qc1 -r $prefix$qc2 -o $prefix
+
 
 ##Check if pairing worked
 if [ -s $prefix.assembled.fastq ]; then
-	echo '... Paired file found OK.'
+	echo -e "\t... Paired file found OK."
 else
 	echo "[ERROR]: Paired output file is empty. Problem with pairing occurred."
 	exit 1
 fi 
 
 ##Tidy up/zipup fastq files
-echo '[INFO 5]: Cleaning up and compressing fastq files'.
+echo '[INFO 7]: Cleaning up and compressing fastq files'.
 for fastq in ./$prefix.*.fastq
 do
 	if [ -s $fastq ]; then	
@@ -94,33 +118,12 @@ do
 	fi
 done
 
-
-<<<<<<< HEAD
-##Run QC on individual fastq
-length=400
-quality=20
-echo "[INFO 6]: Performing quality control using QUASR with -l $length -m $quality options:"
-java -jar $quasr_path -i $prefix.assembled.fastq.gz -o $prefix -q -l $length -m $quality -g -R $r_path 
-=======
-##Run QC on paired fastq
-echo '[INFO 6]: Performing quality control using QUASR:'
-java -jar $quasr_path -i $prefix.assembled.fastq.gz -o $prefix -q -l 150 -m 20 -g -R $r_path 
->>>>>>> 6069c8b4d43ac6e9f0bffe57c22db960e0d050fd
-
-##Check if QC worked
-if [ -s $prefix.qc.fq ]; then
-	echo '... QC reads found.'
-else
-	echo "[ERROR]: QC output file is empty/not found. Problem with QC occurred."
-	exit 1
-fi
-
 ##Barcode filtering
-echo '[INFO 7]: Filtering reads with sequencing barcodes.'
+echo '[INFO 8]: Running PrimerID error correction/template counting on reads with sequencing barcodes.'
 python $barcode_filter_path $prefix
 
 ##Finish
-echo '[INFO 8]: Cleaning up and compressing remaining fastq files'.
+echo '[INFO 9]: Cleaning up and compressing remaining fastq files'.
 for fastq in ./*.fq
 do
 	if [ -s $fastq ]; then	
