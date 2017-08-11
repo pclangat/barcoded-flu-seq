@@ -3,7 +3,7 @@ Processing barcoded (Primer ID) influenza HA sequencing data
 
 General Dependencies: Need to download the following and set your paths in the '.sh' script
 
-##Paths to software dependencies
+## Paths to software dependencies
 #PEAR: http://sco.h-its.org/exelixis/web/software/pear/
 pear_path='/Users/pclangat/Software/pear/bin/pear'
 quasr_path='/Users/pclangat/scripts/scripts_from_others/QUASR/QUASR_v7.02/readsetProcessor.jar'
