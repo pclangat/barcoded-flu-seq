@@ -96,8 +96,7 @@ fi
 
 ##Pair fastq files
 echo "[INFO 6]: Pairing read files using PEAR."
-$pear_path -f $prefix$qc1 -r $prefix$qc2 -o $prefix
-
+$pear_path -n 460 -f $prefix$qc1 -r $prefix$qc2 -o $prefix
 
 ##Check if pairing worked
 if [ -s $prefix.assembled.fastq ]; then

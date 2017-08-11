@@ -39,8 +39,8 @@ def get_primers(pfh):
 	return seqs
 	
 def get_sample_reads(prfx):
-	qc_paired_fastq = prfx+'.qc.fq'
-	qc_paired_fasta = prfx+'.qc.fas'
+	qc_paired_fastq = prfx+'.assembled.fastq.gz'
+	qc_paired_fasta = prfx+'.qc_paired_reads.fas'
 	
 	SeqIO.convert(qc_paired_fastq, "fastq", qc_paired_fasta, "fasta")
 	reads = SeqIO.index(qc_paired_fasta, 'fasta')
@@ -179,7 +179,7 @@ if __name__ == '__main__':
 	
 	print "[INFO]: Reading reverse primers..."
 	rev_primers = get_primers(primers_file)
-	print "\t\s" % rev_primers
+	print "\t%s" % rev_primers
 	
 	reads_dict = get_sample_reads(prefix)		
 	print "[INFO]: Total input sequences (after pairing and QC): %s" % len(reads_dict)
