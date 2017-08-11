@@ -139,6 +139,7 @@ def generate_consensus(alignment):
 ###INITIALISATIONS
 ##Paths to software
 muscle_path = '/Users/pclangat/Software/muscle/muscle3.8.31_i86darwin32'
+muscle_cline = MuscleCommandline(muscle_path)
 
 ##Set SIGALRM
 signal.signal(signal.SIGALRM, timeout_handler)
@@ -152,8 +153,6 @@ min_barcode_count = 2
 #full_rev_primer = "GAGGGTTTCACTTGGACTGGGNNNNANNNNANNNNAAAGCAGTGGTATCAACGCA"
 #pattern = rev_primer+'[A-Z]{4}A[A-Z]{4}A[A-Z]{4}A'
 #pattern = regex.compile('('+pattern+'){e<=5}')
-
-muscle_cline = MuscleCommandline(muscle_path)
 
 ## Load reference fasta
 #reference_file = '/Users/pclangat/Desktop/Projects/2-PrimerID_pipeline/1-daniel_MiSeq_2017-03-01/reference.txt'
@@ -171,7 +170,8 @@ if __name__ == '__main__':
 		print('[USAGE]: %s sample_prefix' % sys.argv[0] )
 		sys.exit(1)
 
-	###STEP 2: Load things and convert qc fastq files to fasta file and load records as dictionary index (i.e. does not save all into memory, good for large fastq files)
+	###STEP 2: Load things and convert qc fastq files to fasta file 
+	###and load records as dictionary index (i.e. does not save all into memory, good for large fastq files)
 	print "\n>>>BARCODE FILTERING & MOLECULAR COUNTING SUMMARY<<<"
 	
 	print "[INFO]: Reading reference sequence..."
@@ -179,7 +179,7 @@ if __name__ == '__main__':
 	
 	print "[INFO]: Reading reverse primers..."
 	rev_primers = get_primers(primers_file)
-	print rev_primers
+	print "\t\s" % rev_primers
 	
 	reads_dict = get_sample_reads(prefix)		
 	print "[INFO]: Total input sequences (after pairing and QC): %s" % len(reads_dict)
