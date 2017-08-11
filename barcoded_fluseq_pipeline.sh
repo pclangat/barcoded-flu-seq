@@ -119,7 +119,7 @@ do
 done
 
 ##Barcode filtering
-echo '[INFO 8]: Filtering reads with sequencing barcodes.'
+echo '[INFO 8]: Running PrimerID error correction/template counting on reads with sequencing barcodes.'
 python $barcode_filter_path $prefix
 
 ##Finish
