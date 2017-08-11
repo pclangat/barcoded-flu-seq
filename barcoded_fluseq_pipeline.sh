@@ -95,11 +95,17 @@ do
 done
 
 
+<<<<<<< HEAD
 ##Run QC on individual fastq
 length=400
 quality=20
 echo "[INFO 6]: Performing quality control using QUASR with -l $length -m $quality options:"
 java -jar $quasr_path -i $prefix.assembled.fastq.gz -o $prefix -q -l $length -m $quality -g -R $r_path 
+=======
+##Run QC on paired fastq
+echo '[INFO 6]: Performing quality control using QUASR:'
+java -jar $quasr_path -i $prefix.assembled.fastq.gz -o $prefix -q -l 150 -m 20 -g -R $r_path 
+>>>>>>> 6069c8b4d43ac6e9f0bffe57c22db960e0d050fd
 
 ##Check if QC worked
 if [ -s $prefix.qc.fq ]; then
