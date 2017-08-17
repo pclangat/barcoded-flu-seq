@@ -28,7 +28,7 @@ def timeout_handler(signum, frame):
 	raise TimeoutException
 
 def get_reference(rfh):
-	for record in SeqIO.parse(reference_file, 'fasta'):
+	for record in SeqIO.parse(rfh, 'fasta'):
 		seq = str(record.seq)
 	return seq
 
