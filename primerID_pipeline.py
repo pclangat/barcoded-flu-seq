@@ -224,7 +224,7 @@ pattern = rev_primer+'[A-Z]{4}A[A-Z]{4}A[A-Z]{4}A'
 pattern = regex.compile('('+pattern+'){e<=5}')
 
 ## Load reference fasta
-reference_file = '/Users/pclangat/Desktop/Projects/2-PrimerID_pipeline/1-daniel_MiSeq_2017-03-01/reference.txt'
+reference_file = '/Users/pclangat/Desktop/Projects/2-PrimerID_pipeline/1-daniel_MiSeq_2017-03-01/reference.fas'
 #reference_file = '../reference.fas'
 #reference_seq = ''
 #primers_file = '../primers.fas'
