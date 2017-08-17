@@ -39,7 +39,8 @@ def get_primers(pfh):
 	return seqs
 	
 def get_sample_reads(prfx):
-	qc_paired_fastq = prfx+'.assembled.fastq.gz'
+	#qc_paired_fastq = prfx+'.assembled.fastq.gz'
+	qc_paired_fastq = prfx+'.qc.fq.gz'
 	qc_paired_fasta = prfx+'.qc_paired_reads.fas'
 	
 	SeqIO.convert(qc_paired_fastq, "fastq", qc_paired_fasta, "fasta")
@@ -54,7 +55,21 @@ def check_barcodes(reads_dict):
 	##For each read, look for reverse primer (either full or partial match)
 	for read in reads_dict:
 		sequence = reads_dict[read].seq
-		for rev_primer in rev_primers:
+		primer_pos, oriented_sequence, match_depth = check_rev_primer_match(rev_primer, sequence)
+		matches.append(match_depth)
+		
+		## If rev primer sequence is found, check if intact rev barcode pattern exists
+		if primer_pos > 0:
+			rev_primer_seq = oriented_sequence[primer_pos:]
+			intact_rev_barcode = regex.findal(pattern, str(rev_primer_seq))
+			
+			## If intact rev barcode pattern, add barcode and associated sequences to barcodes dict
+			if intact_rev_barcode:
+				intact_barcoded_seqs += 1
+				barcode = (intact_rev_barcode[0]).split(rev_primer)[1]
+				barcoded_seqs[barcode].append(oriented_sequence)				
+		
+		'''for rev_primer in rev_primers:
 			pattern = rev_primer+'[A-Z]{4}A[A-Z]{4}A[A-Z]{4}A'
 			pattern = regex.compile('('+pattern+'){e<1}')
 			#primer_pos, oriented_sequence, match_depth = check_rev_primer_match(rev_primer, sequence)
@@ -66,11 +81,64 @@ def check_barcodes(reads_dict):
 				intact_barcoded_seqs += 1
 				barcoded_seqs[barcode].append(oriented_sequence)
 				break
-				
-		matches.append(match_depth)
+		matches.append(match_depth)'''
 	return matches, intact_barcoded_seqs, barcoded_seqs
-	
+
 def check_rev_primer_match(r_primer, seq):
+	match = 'none'
+	pos = seq.find(r_primer)
+	
+	##if match found
+	if pos > -1:
+		match = 'full'
+	##if no match found
+	else:
+		##try reverse complement of sequence
+		rc_seq = seq.reverse_complement()
+		pos = rc_seq.find(r_primer)
+		
+		##if match, re-orient sequence
+		if pos > -1:
+			seq = rc_seq
+			match = 'full'
+		else:
+			##if still no match, try searching for partial match
+			pos, seq, match = check_partial_rev_primer_match(r_primer, seq)
+	return pos, seq, match
+
+def check_partial_rev_primer_match(r_primer, seq):
+	pos = -1
+	match = 'none'
+	
+	#pattern = '('+r_primer+'){e<=2}'
+	#pattern = r_primer+'[A-Z]{4}A[A-Z]{4}A[A-Z]{4}A'
+	
+	pattern = r_primer+'[A-Z]{4}A[A-Z]{4}A[A-Z]{4}A'
+	#pattern = regex.compile('('+pattern+'){e<=1}')
+	pattern = '('+pattern+'){e<=1}'
+	#pattern = '('+r_primer+'){e<=2}'
+	#print pattern 
+	
+	fuzzy_match = regex.search(pattern, str(seq), regex.BESTMATCH)
+	
+	##if partial match found
+	if fuzzy_match:
+		match = 'partial'
+		pos = fuzzy_match.span()[1]
+	##if no partial match found
+	else:
+		##try reverse complement of sequence
+		rc_seq = seq.reverse_complement()
+		fuzz_match = regex.search(pattern, str(rc_seq), regex.BESTMATCH)
+		
+		##if partial match, re-orient sequence:
+		if fuzzy_match:
+			seq = rc_seq
+			match = 'partial'
+			pos = fuzzy_match.span()[1]
+	return pos, seq, match
+	
+'''def check_rev_primer_match(r_primer, seq):
 	match = 'none'
 	discovered = regex.findall(r_primer, str(seq))
 	primer_seq = ''
@@ -115,7 +183,7 @@ def check_partial_rev_primer_match(r_primer, seq):
 			seq = rc_seq
 			match = 'partial'
 			pos = fuzzy_match.span()[1]
-	return pos, seq, match
+	return pos, seq, match'''
 	
 ##Generate alignment for all seqs with same barcode
 def get_alignment(records):
@@ -148,18 +216,18 @@ signal.signal(signal.SIGALRM, timeout_handler)
 ## Barcode read multiplicity minimum
 min_barcode_count = 2
 
-#fwd_primer = "CGGGGAAAATATGCAACAATCCT"
-#rev_primer = "GAGGGTTTCACTTGGACTGGG"
-#full_rev_primer = "GAGGGTTTCACTTGGACTGGGNNNNANNNNANNNNAAAGCAGTGGTATCAACGCA"
-#pattern = rev_primer+'[A-Z]{4}A[A-Z]{4}A[A-Z]{4}A'
-#pattern = regex.compile('('+pattern+'){e<=5}')
+fwd_primer = "CGGGGAAAATATGCAACAATCCT"
+rev_primer = "GAGGGTTTCACTTGGACTGGG"
+full_rev_primer = "GAGGGTTTCACTTGGACTGGGNNNNANNNNANNNNAAAGCAGTGGTATCAACGCA"
+pattern = rev_primer+'[A-Z]{4}A[A-Z]{4}A[A-Z]{4}A'
+pattern = regex.compile('('+pattern+'){e<=5}')
 
 ## Load reference fasta
-#reference_file = '/Users/pclangat/Desktop/Projects/2-PrimerID_pipeline/1-daniel_MiSeq_2017-03-01/reference.txt'
-reference_file = '../reference.fas'
-reference_seq = ''
-primers_file = '../primers.fas'
-rev_primers = []
+reference_file = '/Users/pclangat/Desktop/Projects/2-PrimerID_pipeline/1-daniel_MiSeq_2017-03-01/reference.txt'
+#reference_file = '../reference.fas'
+#reference_seq = ''
+#primers_file = '../primers.fas'
+#rev_primers = []
 		
 ###MAIN
 if __name__ == '__main__':
@@ -174,12 +242,12 @@ if __name__ == '__main__':
 	###and load records as dictionary index (i.e. does not save all into memory, good for large fastq files)
 	print "\n>>>BARCODE FILTERING & MOLECULAR COUNTING SUMMARY<<<"
 	
-	print "[INFO]: Reading reference sequence..."
-	reference_seq = get_reference(reference_file)
+	#print "[INFO]: Reading reference sequence..."
+	#reference_seq = get_reference(reference_file)
 	
-	print "[INFO]: Reading reverse primers..."
-	rev_primers = get_primers(primers_file)
-	print "\t%s" % rev_primers
+	#print "[INFO]: Reading reverse primers..."
+	#rev_primers = get_primers(primers_file)
+	#print "\t%s" % rev_primers
 	
 	reads_dict = get_sample_reads(prefix)		
 	print "[INFO]: Total input sequences (after pairing and QC): %s" % len(reads_dict)
