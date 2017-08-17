@@ -80,23 +80,10 @@ echo "[INFO 4]: Initial quality check of reads using QUASR."
 java -jar $quasr_path -i $prefix$read1 -o $prefix$r1 -g -w 300 -R $r_path
 java -jar $quasr_path -i $prefix$read2 -o $prefix$r2 -g -w 300 -R $r_path 
 
-##Run QC on individual fastq
-length=275
-quality=20
-echo "[INFO 5]: Performing quality control using QUASR with -l $length -m $quality options:"
-java -jar $quasr_path -i $prefix$read1 -r $prefix$read2 -o $prefix -q -l $length -m $quality -z -g -w 300 -R $r_path 
-
-##Check if QC worked
-if [ -s $prefix$qc2 ]; then
-	echo -e '\t... QC reads found.'
-else
-	echo "[ERROR]: QC output file is empty/not found. Problem with QC occurred."
-	exit 1
-fi
 
 ##Pair fastq files
-echo "[INFO 6]: Pairing read files using PEAR."
-$pear_path -n 460 -f $prefix$qc1 -r $prefix$qc2 -o $prefix
+echo "[INFO 5]: Pairing read files using PEAR."
+$pear_path -f $prefix$read1 -r $prefix$read2 -o $prefix
 
 ##Check if pairing worked
 if [ -s $prefix.assembled.fastq ]; then
@@ -105,6 +92,20 @@ else
 	echo "[ERROR]: Paired output file is empty. Problem with pairing occurred."
 	exit 1
 fi 
+
+##Run QC on paired fastq
+length=150
+quality=20
+echo "[INFO 6]: Performing quality control using QUASR with -l $length -m $quality options:"
+java -jar $quasr_path -i $prefix.assembled.fastq -o $prefix -q -l $length -m $quality -z -g -w $length -R $r_path 
+
+##Check if QC worked
+if [ -s $prefix.qc.fq.gz ]; then
+	echo -e '\t... QC reads found.'
+else
+	echo "[ERROR]: QC output file is empty/not found. Problem with QC occurred."
+	exit 1
+fi
 
 ##Tidy up/zipup fastq files
 echo '[INFO 7]: Cleaning up and compressing fastq files'.
