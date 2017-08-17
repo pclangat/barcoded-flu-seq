@@ -62,7 +62,7 @@ def check_barcodes(reads_dict):
 		## If rev primer sequence is found, check if intact rev barcode pattern exists
 		if primer_pos > 0:
 			rev_primer_seq = oriented_sequence[primer_pos:]
-			intact_rev_barcode = regex.findals(pattern, str(rev_primer_seq))
+			intact_rev_barcode = regex.findall(pattern, str(rev_primer_seq))
 			
 			## If intact rev barcode pattern, add barcode and associated sequences to barcodes dict
 			if intact_rev_barcode:
