@@ -111,12 +111,12 @@ def check_partial_rev_primer_match(r_primer, seq):
 	pos = -1
 	match = 'none'
 	
-	#pattern = '('+r_primer+'){e<=2}'
+	pattern = '('+r_primer+'){e<=2}'
 	#pattern = r_primer+'[A-Z]{4}A[A-Z]{4}A[A-Z]{4}A'
 	
-	pattern = r_primer+'[A-Z]{4}A[A-Z]{4}A[A-Z]{4}A'
+	#pattern = r_primer+'[A-Z]{4}A[A-Z]{4}A[A-Z]{4}A'
 	#pattern = regex.compile('('+pattern+'){e<=1}')
-	pattern = '('+pattern+'){e<=1}'
+	#pattern = '('+pattern+'){e<=1}'
 	#pattern = '('+r_primer+'){e<=2}'
 	#print pattern 
 	
@@ -244,7 +244,7 @@ if __name__ == '__main__':
 	print "\n>>>BARCODE FILTERING & MOLECULAR COUNTING SUMMARY<<<"
 	
 	#print "[INFO]: Reading reference sequence..."
-	#reference_seq = get_reference(reference_file)
+	reference_seq = get_reference(reference_file)
 	
 	#print "[INFO]: Reading reverse primers..."
 	#rev_primers = get_primers(primers_file)
