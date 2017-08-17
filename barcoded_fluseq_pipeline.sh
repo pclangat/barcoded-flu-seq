@@ -97,10 +97,12 @@ fi
 length=150
 quality=20
 echo "[INFO 6]: Performing quality control using QUASR with -l $length -m $quality options:"
+#java -jar $quasr_path -i $prefix.assembled.fastq -o $prefix -q -l $length -m $quality -z -g -w $length -R $r_path 
 java -jar $quasr_path -i $prefix.assembled.fastq -o $prefix -q -l $length -m $quality -g -w $length -R $r_path 
 
 ##Check if QC worked
-if [ -s $prefix.qc.fq.gz ]; then
+#if [ -s $prefix.qc.fq.gz ]; then
+if [ -s $prefix.qc.fq ]; then
 	echo -e '\t... QC reads found.'
 else
 	echo "[ERROR]: QC output file is empty/not found. Problem with QC occurred."

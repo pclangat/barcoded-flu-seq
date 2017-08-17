@@ -40,6 +40,7 @@ def get_primers(pfh):
 	
 def get_sample_reads(prfx):
 	#qc_paired_fastq = prfx+'.assembled.fastq.gz'
+	#qc_paired_fastq = prfx+'.qc.fq.gz'
 	qc_paired_fastq = prfx+'.qc.fq'
 	qc_paired_fasta = prfx+'.qc_paired_reads.fas'
 	
@@ -61,7 +62,7 @@ def check_barcodes(reads_dict):
 		## If rev primer sequence is found, check if intact rev barcode pattern exists
 		if primer_pos > 0:
 			rev_primer_seq = oriented_sequence[primer_pos:]
-			intact_rev_barcode = regex.findal(pattern, str(rev_primer_seq))
+			intact_rev_barcode = regex.findals(pattern, str(rev_primer_seq))
 			
 			## If intact rev barcode pattern, add barcode and associated sequences to barcodes dict
 			if intact_rev_barcode:
