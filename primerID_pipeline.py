@@ -198,6 +198,8 @@ def get_alignment(records):
 	SeqIO.write(records, child.stdin, "fasta")
 	child.stdin.close()
 	align = AlignIO.read(child.stdout, "fasta")
+	child.stdout.close()
+	child.stderr.close()
 	return align
 
 def generate_consensus(alignment):
