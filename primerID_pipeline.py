@@ -189,7 +189,7 @@ def check_partial_rev_primer_match(r_primer, seq):
 ##Generate alignment for all seqs with same barcode
 def get_alignment(records):
 	##open up muscle
-	child = subprocess.Popen(str(muscle_cline),
+	child = subprocess.Popen("exec " + str(muscle_cline),
 							stdin=subprocess.PIPE,
 							stdout=subprocess.PIPE,
 							stderr=subprocess.PIPE,
