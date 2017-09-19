@@ -199,9 +199,15 @@ def get_alignment(records):
 	SeqIO.write(records, child.stdin, "fasta")
 	child.stdin.close()
 	align = AlignIO.read(child.stdout, "fasta")
-	exit_status = child.wait()
-	sys.exit(exit_status)
+	
+	child.kill()
+	
+	#exit_status = child.wait()
+	#print exit_status
+	#sys.exit(exit_status)
+	
 	#child.communicate()
+	
 	#child.stdout.close()
 	#child.stderr.close()
 	return align
