@@ -201,7 +201,9 @@ def get_alignment(records):
 	child.stdin.close()
 	align = AlignIO.read(child.stdout, "fasta")
 	
-	child.terminate()
+	child.kill()
+	
+	#child.terminate()
 	
 	#exit_status = child.wait()
 	#print exit_status
