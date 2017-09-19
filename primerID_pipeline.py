@@ -189,19 +189,22 @@ def check_partial_rev_primer_match(r_primer, seq):
 ##Generate alignment for all seqs with same barcode
 def get_alignment(records):
 	##open up muscle
-	child = subprocess.Popen("exec " + str(muscle_cline),
+	#child = subprocess.Popen("exec " + str(muscle_cline),
+	child = subprocess.Popen(str(muscle_cline),
 							stdin=subprocess.PIPE,
 							stdout=subprocess.PIPE,
 							stderr=subprocess.PIPE,
 							universal_newlines=True,
 							#shell=(sys.platform!="win32"),
 							shell=True,
-							close_fds=True)
+							#close_fds=True)
+							preexec_fn=os.setsid)
 	SeqIO.write(records, child.stdin, "fasta")
 	child.stdin.close()
 	align = AlignIO.read(child.stdout, "fasta")
 	
-	child.kill()
+	os.killpg(os.getpgid(child.pid), signal.SIGTERM)
+	#child.kill()
 	
 	#child.terminate()
 	
