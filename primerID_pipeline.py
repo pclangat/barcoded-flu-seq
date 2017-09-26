@@ -265,8 +265,8 @@ if __name__ == '__main__':
 	reference_seq = get_reference(reference_file)
 	
 	#print "[INFO]: Reading reverse primers..."
-	#rev_primers = get_primers(primers_file)
-	#print "\t%s" % rev_primers
+	rev_primers = get_primers(primers_file)
+	print "\t%s" % rev_primers
 	
 	reads_dict = get_sample_reads(prefix)		
 	print "[INFO]: Total input sequences (after pairing and QC): %s" % len(reads_dict)
