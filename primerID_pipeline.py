@@ -203,7 +203,7 @@ def get_alignment(records):
 	child.stdin.close()
 	align = AlignIO.read(child.stdout, "fasta")
 	
-	os.killpg(os.getpgid(child.pid), signal.SIGTERM)
+	#os.killpg(os.getpgid(child.pid), signal.SIGTERM)
 	#child.kill()
 	
 	#child.terminate()
