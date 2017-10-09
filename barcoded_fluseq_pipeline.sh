@@ -122,7 +122,7 @@ do
 	fi
 done
 
-for fastq in ./$prefix.*.fq
+for fastq in ./$prefix.*.fastq
 do
 	if [ -s $fastq ]; then	
 			gzip -f $fastq
