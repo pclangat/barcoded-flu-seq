@@ -39,7 +39,8 @@ def get_primers(pfh):
 	return seqs
 	
 def get_sample_reads(prfx):
-	qc_paired_fastq = prfx+'.qc.fq'
+	#qc_paired_fastq = prfx+'.qc.fq'
+	qc_paired_fastq = prfx+'.assembled.fastq'
 	qc_paired_fasta = prfx+'.qc.fas'
 	
 	SeqIO.convert(qc_paired_fastq, "fastq", qc_paired_fasta, "fasta")
