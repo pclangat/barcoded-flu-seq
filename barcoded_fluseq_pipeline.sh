@@ -107,7 +107,7 @@ else
 	exit 1
 fi 
 
-##Tidy up/zipup fastq files
+'''##Tidy up/zipup fastq files
 echo '[INFO 7]: Cleaning up and compressing fastq files'.
 for fastq in ./$prefix.*.fastq
 do
@@ -116,7 +116,7 @@ do
 	else
 		rm $fastq
 	fi
-done
+done'''
 
 ##Barcode filtering
 echo '[INFO 8]: Running PrimerID error correction/template counting on reads with sequencing barcodes.'
