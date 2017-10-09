@@ -113,7 +113,16 @@ python $barcode_filter_path $prefix
 
 ##Finish
 echo '[INFO 9]: Cleaning up and compressing remaining fastq files'.
-for fastq in ./*.fq
+for fastq in ./$prefix.*.fq
+do
+	if [ -s $fastq ]; then	
+			gzip -f $fastq
+	else
+		rm $fastq
+	fi
+done
+
+for fastq in ./$prefix.*.fq
 do
 	if [ -s $fastq ]; then	
 			gzip -f $fastq
