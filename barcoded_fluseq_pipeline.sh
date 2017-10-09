@@ -107,17 +107,6 @@ else
 	exit 1
 fi 
 
-'''##Tidy up/zipup fastq files
-echo '[INFO 7]: Cleaning up and compressing fastq files'.
-for fastq in ./$prefix.*.fastq
-do
-	if [ -s $fastq ]; then	
-			gzip -f $fastq
-	else
-		rm $fastq
-	fi
-done'''
-
 ##Barcode filtering
 echo '[INFO 8]: Running PrimerID error correction/template counting on reads with sequencing barcodes.'
 python $barcode_filter_path $prefix
