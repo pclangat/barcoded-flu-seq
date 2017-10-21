@@ -73,6 +73,7 @@ def check_barcodes(reads_dict):
 		for rev_primer in rev_primers:
 			pattern = rev_primer+'[A-Z]{4}A[A-Z]{4}A[A-Z]{4}A'
 			pattern = regex.compile('('+pattern+'){e<1}')
+			print pattern
 			#primer_pos, oriented_sequence, match_depth = check_rev_primer_match(rev_primer, sequence)
 			primer_seq, oriented_sequence, match_depth = check_rev_primer_match(pattern, sequence)
 			
