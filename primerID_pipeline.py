@@ -56,7 +56,7 @@ def check_barcodes(reads_dict):
 	##For each read, look for reverse primer (either full or partial match)
 	for read in reads_dict:
 		sequence = reads_dict[read].seq
-		'''primer_pos, oriented_sequence, match_depth = check_rev_primer_match(rev_primer, sequence)
+		primer_pos, oriented_sequence, match_depth = check_rev_primer_match(rev_primer, sequence)
 		matches.append(match_depth)
 		
 		## If rev primer sequence is found, check if intact rev barcode pattern exists
@@ -68,9 +68,9 @@ def check_barcodes(reads_dict):
 			if intact_rev_barcode:
 				intact_barcoded_seqs += 1
 				barcode = (intact_rev_barcode[0]).split(rev_primer)[1]
-				barcoded_seqs[barcode].append(oriented_sequence)'''				
+				barcoded_seqs[barcode].append(oriented_sequence)				
 		
-		for rev_primer in rev_primers:
+		'''for rev_primer in rev_primers:
 			pattern = rev_primer+'[A-Z]{4}A[A-Z]{4}A[A-Z]{4}A'
 			pattern = regex.compile('('+pattern+'){e<1}')
 			print pattern
@@ -83,7 +83,7 @@ def check_barcodes(reads_dict):
 				intact_barcoded_seqs += 1
 				barcoded_seqs[barcode].append(oriented_sequence)
 				break
-		matches.append(match_depth)
+		matches.append(match_depth)'''
 	return matches, intact_barcoded_seqs, barcoded_seqs
 
 def check_rev_primer_match(r_primer, seq):
@@ -246,7 +246,7 @@ pattern = regex.compile('('+pattern+'){e<=5}')
 ##reference_file = '/Users/pclangat/Desktop/Projects/2-PrimerID_pipeline/1-daniel_MiSeq_2017-03-01/reference.fas'
 reference_file = '../reference.fas'
 #reference_seq = ''
-primers_file = '../primers.fas'
+#primers_file = '../primers.fas'
 #rev_primers = []
 		
 ###MAIN
@@ -266,8 +266,8 @@ if __name__ == '__main__':
 	reference_seq = get_reference(reference_file)
 	
 	#print "[INFO]: Reading reverse primers..."
-	rev_primers = get_primers(primers_file)
-	print "\t%s" % rev_primers
+	#rev_primers = get_primers(primers_file)
+	#print "\t%s" % rev_primers
 	
 	reads_dict = get_sample_reads(prefix)		
 	print "[INFO]: Total input sequences (after pairing and QC): %s" % len(reads_dict)
