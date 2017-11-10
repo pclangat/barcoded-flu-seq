@@ -58,6 +58,8 @@ cd $sample_path
 ##Get fastq read files
 read1="_R1_001.fastq.gz"
 read2="_R2_001.fastq.gz"
+read1unzip="_R1_001.fastq"
+read2unzip="_R2_001.fastq"
 r1="_R1"
 r2="_R2"
 qc1=".qc.f.fq.gz"
@@ -80,10 +82,14 @@ echo "[INFO 4]: Initial quality check of reads using QUASR."
 java -jar $quasr_path -i $prefix$read1 -o $prefix$r1 -g -w 300 -R $r_path
 java -jar $quasr_path -i $prefix$read2 -o $prefix$r2 -g -w 300 -R $r_path 
 
+##Unzip fastq files
+echo "[INFO 5a]: Gunzipping fastq read files."
+gunzip $prefix$read1
+gunzip $prefix$read2
 
 ##Pair fastq files
-echo "[INFO 5]: Pairing read files using PEAR."
-$pear_path -f $prefix$read1 -r $prefix$read2 -o $prefix
+echo "[INFO 5b]: Pairing read files using PEAR."
+$pear_path -f $prefix$read1unzip -r $prefix$read2unzip -o $prefix
 
 ##Check if pairing worked
 if [ -s $prefix.assembled.fastq ]; then
@@ -144,4 +150,5 @@ done
 
 cd ..
 echo "Done."
-mv log.$prefix.txt $sample_path
+mv log.$prefix.o $sample_path
+mv log.$prefix.e $sample_path
