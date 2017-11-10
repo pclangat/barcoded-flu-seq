@@ -261,6 +261,7 @@ if __name__ == '__main__':
 	###STEP 2: Load things and convert qc fastq files to fasta file 
 	###and load records as dictionary index (i.e. does not save all into memory, good for large fastq files)
 	print "\n>>>BARCODE FILTERING & MOLECULAR COUNTING SUMMARY<<<"
+	sys.stdout.flush() 
 	
 	#print "[INFO]: Reading reference sequence..."
 	reference_seq = get_reference(reference_file)
@@ -271,6 +272,7 @@ if __name__ == '__main__':
 	
 	reads_dict = get_sample_reads(prefix)		
 	print "[INFO]: Total input sequences (after pairing and QC): %s" % len(reads_dict)
+	sys.stdout.flush() 
 	
 	###STEP 3: Find reverse primer (gene portion) in read sequence, count whether full or partial or no match
 	matches, intact_barcoded_seqs, barcoded_seqs = check_barcodes(reads_dict)
@@ -286,15 +288,17 @@ if __name__ == '__main__':
 	print "... Reverse primer not found: %s" % matches.count('none')
 	print "[INFO]: Sequences with intact barcodes: %s (%.1f%%)" % (intact_barcoded_seqs, percent_i)
 	print "... Representing # of unique barcodes: %s (%.1f%%)" % (len(barcoded_seqs), percent_b)
-	
+	sys.stdout.flush() 
 	sum = 0
 	for barcode in barcoded_seqs:
 		print(">%s\n%s" % (barcode, len(barcoded_seqs[barcode])))
+		sys.stdout.flush() 
 		sum += len(barcoded_seqs[barcode])
 	print "total: %s" % sum
-	
+	sys.stdout.flush() 
 	###STEP 4: Count number of seqs associated to each barcode (i.e. barcode multiplicity/count), decide whether to process
 	print "[INFO]: Checking barcode multiplicity and filtering"
+	sys.stdout.flush() 
 	barcodes_to_process_count = 0
 	barcode_distribution = {}
 	consensus_records = []
@@ -303,6 +307,7 @@ if __name__ == '__main__':
 	b=1
 	for barcode in barcoded_seqs:
 		print "barcode %s" % b
+		sys.stdout.flush() 
 		barcode_count = len(barcoded_seqs[barcode])	
 		
 		##Add frequency of barcode counts to a dictionary for count distribution
@@ -332,6 +337,7 @@ if __name__ == '__main__':
 				##Take barcode_group and align it
 				print "getting alignment for %s" % barcode
 				print "number of records: %s" % len(barcode_group_records)
+				sys.stdout.flush() 
 				aligned_barcode_group = get_alignment(barcode_group_records)
 			
 				##Get consensus of alignment
@@ -343,6 +349,7 @@ if __name__ == '__main__':
 					consensus_records.append(consensus_rec)
 		except TimeoutException:
 			print "[WARNING]: Timed out alignment. Barcode group not included."
+			sys.stdout.flush() 
 			continue
 		else:
 			# Reset the alarm
@@ -350,8 +357,10 @@ if __name__ == '__main__':
 		b+=1
 		
 	print "... Barcode multiplicity (read count) distribution:"
+	sys.stdout.flush() 
 	for i in barcode_distribution:
 		print "\t%s\t%s" % (i, barcode_distribution[i])
+		sys.stdout.flush() 
 	
 	percent_p = 100.0*barcodes_to_process_count/len(barcoded_seqs)
 	percent_c = 100.0*len(consensus_records)/barcodes_to_process_count
@@ -359,12 +368,14 @@ if __name__ == '__main__':
 	print "... Barcodes with multiplicity >%s to process: %s (%.1f%%)" % (min_barcode_count, barcodes_to_process_count, percent_p)
 	print "... Total unambiguous consensus (i.e. template) sequences: %s (%.1f%%)" % (len(consensus_records), percent_c)
 	print "... Output generated to file %s.barcode_filtered.fas with headers '>Sample_Name-Barcode-#Reads'" % prefix
+	sys.stdout.flush() 
+	
 	##Put barcodes to process into a fasta file
 	SeqIO.write(consensus_records, '%s.barcode_filtered.fas' % prefix, 'fasta')
 	
 	###STEP 5: Compare template sequences and group matching ones together and count #templates
 	print "[INFO]: Checking template sequences for unique sequence variants"
-
+	sys.stdout.flush() 
 	template_sequences = []
 	unique_sequences = {}
 	
@@ -400,6 +411,7 @@ if __name__ == '__main__':
 	
 	###STEP 6: Name and align sequences, generate fasta output
 	print "[INFO]: Creating output fasta '%s.unique_sequences.fas' of aligned unique sequence variants with headers '>Sample_Name-#AssociatedTemplates'" % prefix
+	sys.stdout.flush() 
 	##Header is sample prefix+number of templates associated with sequence
 	unique_records = []
 	#for s in unique_sequences:
@@ -420,6 +432,7 @@ if __name__ == '__main__':
 		aligned_unique_records.sort(reverse=True)
 	except TimeoutException:
 		print "[WARNING]: Timed out alignment. Not aligning unique sequences."
+		sys.stdout.flush() 
 		aligned_unique_records = unique_records
 	else:
 		# Reset the alarm

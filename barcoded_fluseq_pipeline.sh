@@ -118,7 +118,7 @@ fi
 
 ##Tidy up/zipup fastq files
 echo '[INFO 7]: Cleaning up and compressing fastq files'.
-for fastq in ./$prefix.*.fastq
+for fastq in ./*.fastq
 do
 	if [ -s $fastq ]; then	
 			gzip -f $fastq
@@ -149,6 +149,6 @@ do
 done
 
 cd ..
-echo "Done."
 mv log.$prefix.o $sample_path
 mv log.$prefix.e $sample_path
+echo "Done."
