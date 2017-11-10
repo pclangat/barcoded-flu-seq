@@ -226,7 +226,7 @@ def generate_consensus(alignment):
 				
 ###INITIALISATIONS
 ##Paths to software
-muscle_path = '/Users/pclangat/Software/muscle/muscle3.8.31_i86darwin32'
+muscle_path = '/software/CGP/external-apps/muscle3.8.31_i86linux64/muscle3.8.31_i86linux64'
 muscle_cline = MuscleCommandline(muscle_path)
 
 ##Set SIGALRM

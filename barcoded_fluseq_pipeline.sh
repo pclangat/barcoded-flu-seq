@@ -3,10 +3,10 @@
 
 ##Paths to software dependencies
 #PEAR: http://sco.h-its.org/exelixis/web/software/pear/
-pear_path='/Users/pclangat/Software/pear/bin/pear'
-quasr_path='/Users/pclangat/scripts/scripts_from_others/QUASR/QUASR_v7.02/readsetProcessor.jar'
-r_path='/usr/local/bin/R'
-barcode_filter_path='/Users/pclangat/scripts/barcoded-flu-seq/primerID_pipeline.py'
+pear_path='/software/pathogen/external/apps/usr/bin/pear'
+quasr_path='/software/pathogen/external/apps/usr/local/QUASR/readsetProcessor.jar'
+r_path='/software/R-3.4.2/bin/R'
+barcode_filter_path='/nfs/users/nfs_p/pl6/scripts/barcoded-flu-seq/primerID_pipeline.py'
 
 ##Help message
 if [ "$#" = "0" ]; then
