@@ -1,5 +1,5 @@
 #! /bin/bash
-# ~/scrpts/barcoded-flu-seq/wrapper_script.sh -i <prefix_list_file>
+# ~/scripts/barcoded-flu-seq/wrapper_script.sh -i <prefix_list_file>
 
 ## Takes file of prefixes as input, runs barcoded_fluseq_pipeline.sh for each prefix and outputs log file
 
@@ -29,9 +29,17 @@ while getopts ":i:h" flag; do
 	esac
 done
 
-if [ "$prefix" = '' ]; then
+if [ "$infile" = '' ]; then
 	echo '[ERROR]: Incorrect usage. See -h for details.'
 	exit 1
 fi
 
 ## Read listfile
+
+while read -r line
+do
+	prefix="$line"
+	echo "Processing $prefix..."
+	/Users/pclangat/scripts/barcoded-flu-seq/barcoded_fluseq_pipeline.sh -i $prefix > "log.$prefix.txt"
+done < "$infile"
+	
