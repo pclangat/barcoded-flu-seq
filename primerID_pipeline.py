@@ -190,8 +190,10 @@ def check_partial_rev_primer_match(r_primer, seq):
 ##Generate alignment for all seqs with same barcode
 def get_alignment(records):
 	##open up muscle
-	#child = subprocess.Popen("exec " + str(muscle_cline),
-	child = subprocess.Popen(str(muscle_cline),
+	print muscle_cline
+	print str(muscle_cline)
+	child = subprocess.Popen("exec " + str(muscle_cline),
+	#child = subprocess.Popen(str(muscle_cline),
 							stdin=subprocess.PIPE,
 							stdout=subprocess.PIPE,
 							stderr=subprocess.PIPE,
@@ -199,13 +201,15 @@ def get_alignment(records):
 							#shell=(sys.platform!="win32"),
 							shell=True,
 							#close_fds=True)
-							preexec_fn=os.setsid)
+							#preexec_fn=os.setsid)
 	SeqIO.write(records, child.stdin, "fasta")
 	child.stdin.close()
 	align = AlignIO.read(child.stdout, "fasta")
 	
 	#os.killpg(os.getpgid(child.pid), signal.SIGTERM)
-	#child.kill()
+	
+	print child.pid
+	child.kill()
 	
 	#child.terminate()
 	
@@ -240,13 +244,13 @@ fwd_primer = "CGGGGAAAATATGCAACAATCCT"
 
 ## Load reverse primer
 primer_file = '../primers.fas'
-with open(primer_file, r) as pfh:
+with open(primer_file, 'r') as pfh:
 	for line in pfh:
 		rev_primer = line.strip()
 		print rev_primer
 pattern = rev_primer+'[A-Z]{4}A[A-Z]{4}A[A-Z]{4}A'
 pattern = regex.compile('('+pattern+'){e<=5}')
-print("%Rev primer: %s" % pattern)
+print("Rev primer: %s" % pattern)
 
 ## Load reference fasta
 reference_file = '../reference.fas'
