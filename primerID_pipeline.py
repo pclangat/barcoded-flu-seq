@@ -190,8 +190,6 @@ def check_partial_rev_primer_match(r_primer, seq):
 ##Generate alignment for all seqs with same barcode
 def get_alignment(records):
 	##open up muscle
-	print muscle_cline
-	print str(muscle_cline)
 	child = subprocess.Popen("exec " + str(muscle_cline),
 	#child = subprocess.Popen(str(muscle_cline),
 							stdin=subprocess.PIPE,
@@ -209,8 +207,9 @@ def get_alignment(records):
 	#os.killpg(os.getpgid(child.pid), signal.SIGTERM)
 	
 	print child.pid
+	child.poll()
 	child.kill()
-	
+	child.poll()
 	#child.terminate()
 	
 	#exit_status = child.wait()
