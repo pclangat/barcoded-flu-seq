@@ -199,7 +199,7 @@ def get_alignment(records):
 							stderr=subprocess.PIPE,
 							universal_newlines=True,
 							#shell=(sys.platform!="win32"),
-							shell=True,
+							shell=True)
 							#close_fds=True)
 							#preexec_fn=os.setsid)
 	SeqIO.write(records, child.stdin, "fasta")
