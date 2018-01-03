@@ -189,8 +189,8 @@ def check_partial_rev_primer_match(r_primer, seq):
 	
 ##Generate alignment for all seqs with same barcode
 def get_alignment(records):
-	##open up muscle
-	child = subprocess.Popen("exec " + str(muscle_cline),
+	##open up muscle using a subprocess
+	'''child = subprocess.Popen("exec " + str(muscle_cline),
 	#child = subprocess.Popen(str(muscle_cline),
 							stdin=subprocess.PIPE,
 							stdout=subprocess.PIPE,
@@ -209,7 +209,6 @@ def get_alignment(records):
 	print child.pid
 	child.poll()
 	child.kill()
-	child.poll()
 	#child.terminate()
 	
 	#exit_status = child.wait()
@@ -219,7 +218,17 @@ def get_alignment(records):
 	#child.communicate()
 	
 	#child.stdout.close()
-	#child.stderr.close()
+	#child.stderr.close()'''
+	
+	##align with muscle using StringIO
+	in_handle = StringIO()
+	SeqIO.write(records, in_handle, "fasta")
+	to_align = in_handle.getvalue()
+	
+	stdout, stderr = muscle_cline(stdin=to_align)
+	align = AlignIO.read(StringIO(stdout), "fasta")
+	print(align)
+	
 	return align
 
 def generate_consensus(alignment):
