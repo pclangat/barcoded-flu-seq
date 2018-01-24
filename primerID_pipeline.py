@@ -67,7 +67,8 @@ def check_barcodes(reads_dict):
 			## If intact rev barcode pattern, add barcode and associated sequences to barcodes dict
 			if intact_rev_barcode:
 				intact_barcoded_seqs += 1
-				barcode = (intact_rev_barcode[0]).split(rev_primer)[1]
+				#barcode = (intact_rev_barcode[0]).split(rev_primer)[1]
+				barcode = (intact_rev_barcode[0]).split(rev_primer)[0]
 				barcoded_seqs[barcode].append(oriented_sequence)				
 		
 		'''for rev_primer in rev_primers:
@@ -254,9 +255,10 @@ with open(primer_file, 'r') as pfh:
 	for line in pfh:
 		rev_primer = line.strip()
 		print rev_primer
-pattern = rev_primer+'[A-Z]{4}A[A-Z]{4}A[A-Z]{4}A'
+#pattern = rev_primer+'[A-Z]{4}A[A-Z]{4}A[A-Z]{4}A'
+pattern = 'T[A-Z]{4}T[A-Z]{4}T[A-Z]{4}'+rev_primer
 pattern = regex.compile('('+pattern+'){e<=5}')
-print("Rev primer: %s" % pattern)
+print("Barcoded primer: %s" % pattern)
 
 ## Load reference fasta
 reference_file = '../reference.fas'
