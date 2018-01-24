@@ -59,6 +59,9 @@ def check_barcodes(reads_dict):
 		primer_pos, oriented_sequence, match_depth = check_rev_primer_match(rev_primer, sequence)
 		matches.append(match_depth)
 		
+		print("%s: %s" % (match_depth, oriented_sequence))
+		sys.stdout.flush() 
+		
 		## If rev primer sequence is found, check if intact rev barcode pattern exists
 		if primer_pos > 0:
 			rev_primer_seq = oriented_sequence[primer_pos:]
