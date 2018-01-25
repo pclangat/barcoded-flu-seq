@@ -249,7 +249,7 @@ signal.signal(signal.SIGALRM, timeout_handler)
 
 ##These will become user-accepted later
 ## Barcode read multiplicity minimum
-min_barcode_count = 2
+min_barcode_count = 0
 
 ## Load reverse primer
 primer_file = '../primers.fas'
