@@ -291,7 +291,16 @@ if __name__ == '__main__':
 	for barcode in barcoded_seqs:
 		print(">%s\n%s" % (barcode, len(barcoded_seqs[barcode])))
 		sum += len(barcoded_seqs[barcode])
+		
+		## make barcode-trimmed file before barcode filtering
+		bc_count = 1
+		for seq in barcoded_seqs[barcode]
+			bc_trim_name = ("%s-%s" % (barcode, bc_count))
+			bc_trim_rec = SeqRecord(barcoded_seq, id=bc_trim_name, description='')
+			bc_trim_records.append(bc_trim_rec)		
+			bc_count += 1
 	print "total: %s" % sum
+	SeqIO.write(bc_trim_records, '%s.prefiltered_barcode_trimmed.fas' % prefix, 'fasta')
 	
 	###STEP 4: Count number of seqs associated to each barcode (i.e. barcode multiplicity/count), decide whether to process
 	print "[INFO]: Checking barcode multiplicity and filtering"
