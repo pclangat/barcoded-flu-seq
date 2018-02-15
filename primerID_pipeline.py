@@ -67,6 +67,7 @@ def check_barcodes(reads_dict):
 			## If intact rev barcode pattern, add barcode and associated sequences to barcodes dict
 			if intact_rev_barcode:
 				intact_barcoded_seqs += 1
+				print intact_rev_barcode
 				barcode = (intact_rev_barcode[0]).split(rev_primer)[1]
 				barcoded_seqs[barcode].append(oriented_sequence)				
 		
@@ -257,7 +258,7 @@ with open(primer_file, 'r') as pfh:
 		rev_primer = line.strip()
 		print rev_primer
 pattern = rev_primer+'[A-Z]{4}A[A-Z]{4}A[A-Z]{4}A'
-pattern = regex.compile('('+pattern+'){e<=5}')
+pattern = regex.compile('('+pattern+'){e<=2}')
 print("Rev primer: %s" % pattern)
 
 ## Load reference fasta
@@ -359,7 +360,8 @@ if __name__ == '__main__':
 				consensus_name = '%s-%s-%s' % (prefix, barcode, barcode_count)
 				consensus_seq = generate_consensus(aligned_barcode_group)
 
-				if 'N' not in consensus_seq:
+				#if 'N' not in consensus_seq:
+				if 'X' not in consensus_seq:
 					consensus_rec = SeqRecord(consensus_seq, id=consensus_name, description='')
 					consensus_records.append(consensus_rec)
 		except TimeoutException:
