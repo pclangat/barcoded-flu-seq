@@ -89,7 +89,8 @@ gunzip $prefix$read2
 
 ##Pair fastq files
 echo "[INFO 5b]: Pairing read files using PEAR."
-$pear_path -f $prefix$read1unzip -r $prefix$read2unzip -o $prefix
+#$pear_path -f $prefix$read1unzip -r $prefix$read2unzip -o $prefix
+$pear_path -f $prefix$read1unzip -r $prefix$read2unzip -o $prefix -v 0 -m 304 -n 304
 
 ##Check if pairing worked
 if [ -s $prefix.assembled.fastq ]; then
