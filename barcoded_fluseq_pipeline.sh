@@ -65,7 +65,7 @@ r2="_R2"
 qc1=".qc.f.fq.gz"
 qc2=".qc.r.fq.gz"
 
-if [ -f $prefix$read1 ]; then
+'if [ -f $prefix$read1 ]; then
 	echo -e "\t... Found read1 '$prefix$read1'"
 	if [ -f $prefix$read2 ]; then
 		echo -e "\t... Found read2 '$prefix$read2'"
@@ -89,11 +89,11 @@ gunzip $prefix$read2
 
 ##Pair fastq files
 echo "[INFO 5b]: Pairing read files using PEAR."
-#$pear_path -f $prefix$read1unzip -r $prefix$read2unzip -o $prefix
-$pear_path -f $prefix$read1unzip -r $prefix$read2unzip -o $prefix -v 0 -m 304 -n 304
+$pear_path -f $prefix$read1unzip -r $prefix$read2unzip -o $prefix'
 
 ##Check if pairing worked
-if [ -s $prefix.assembled.fastq ]; then
+#if [ -s $prefix.assembled.fastq ]; then
+if [ -s $prefix.pair.fastq ]; then
 	echo -e "\t... Paired file found OK."
 else
 	echo "[ERROR]: Paired output file is empty. Problem with pairing occurred."
@@ -106,7 +106,8 @@ quality=20
 pairedlength=300
 echo "[INFO 6]: Performing quality control using QUASR with -l $length -m $quality options:"
 #java -jar $quasr_path -i $prefix.assembled.fastq -o $prefix -q -l $length -m $quality -z -g -w $length -R $r_path 
-java -jar $quasr_path -i $prefix.assembled.fastq -o $prefix -q -l $length -m $quality -g -w $pairedlength -R $r_path 
+#java -jar $quasr_path -i $prefix.assembled.fastq -o $prefix -q -l $length -m $quality -g -w $pairedlength -R $r_path 
+java -jar $quasr_path -i $prefix.pair.fastq.gz -o $prefix -q -l $length -m $quality -g -w $pairedlength -R $r_path 
 
 ##Check if QC worked
 #if [ -s $prefix.qc.fq.gz ]; then
