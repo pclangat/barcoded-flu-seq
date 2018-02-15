@@ -65,35 +65,35 @@ r2="_R2"
 qc1=".qc.f.fq.gz"
 qc2=".qc.r.fq.gz"
 
-'if [ -f $prefix$read1 ]; then
-	echo -e "\t... Found read1 '$prefix$read1'"
-	if [ -f $prefix$read2 ]; then
-		echo -e "\t... Found read2 '$prefix$read2'"
-	else
-		echo "[ERROR]: Read2 '$prefix$read2' not found."
-	fi
-else
-	echo "[ERROR]: Read1 '$prefix$read1' not found."
-	exit 1
-fi
+#if [ -f $prefix$read1 ]; then
+#	echo -e "\t... Found read1 '$prefix$read1'"
+#	if [ -f $prefix$read2 ]; then
+#		echo -e "\t... Found read2 '$prefix$read2'"
+#	else
+#		echo "[ERROR]: Read2 '$prefix$read2' not found."
+#	fi
+#else
+#	echo "[ERROR]: Read1 '$prefix$read1' not found."
+#	exit 1
+#fi
 
 ##Initial quality check
-echo "[INFO 4]: Initial quality check of reads using QUASR."
-java -jar $quasr_path -i $prefix$read1 -o $prefix$r1 -g -w 300 -R $r_path
-java -jar $quasr_path -i $prefix$read2 -o $prefix$r2 -g -w 300 -R $r_path 
+#echo "[INFO 4]: Initial quality check of reads using QUASR."
+#java -jar $quasr_path -i $prefix$read1 -o $prefix$r1 -g -w 300 -R $r_path
+#java -jar $quasr_path -i $prefix$read2 -o $prefix$r2 -g -w 300 -R $r_path 
 
 ##Unzip fastq files
-echo "[INFO 5a]: Gunzipping fastq read files."
-gunzip $prefix$read1
-gunzip $prefix$read2
+#echo "[INFO 5a]: Gunzipping fastq read files."
+#gunzip $prefix$read1
+#gunzip $prefix$read2
 
 ##Pair fastq files
-echo "[INFO 5b]: Pairing read files using PEAR."
-$pear_path -f $prefix$read1unzip -r $prefix$read2unzip -o $prefix'
+#echo "[INFO 5b]: Pairing read files using PEAR."
+#$pear_path -f $prefix$read1unzip -r $prefix$read2unzip -o $prefix
 
 ##Check if pairing worked
 #if [ -s $prefix.assembled.fastq ]; then
-if [ -s $prefix.pair.fastq ]; then
+if [ -s $prefix.pair.fastq.gz ]; then
 	echo -e "\t... Paired file found OK."
 else
 	echo "[ERROR]: Paired output file is empty. Problem with pairing occurred."
