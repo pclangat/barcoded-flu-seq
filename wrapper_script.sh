@@ -40,6 +40,7 @@ while read -r line
 do
 	prefix="$line"
 	echo "Processing $prefix..."
-	/Users/pclangat/scripts/barcoded-flu-seq/barcoded_fluseq_pipeline.sh -i $prefix > "log.$prefix.txt"
+	# /Users/pclangat/scripts/barcoded-flu-seq/barcoded_fluseq_pipeline.sh -i $prefix > "log.$prefix.txt"
+	bsub.py 5 log.$prefix /nfs/users/nfs_p/pl6/scripts/barcoded-flu-seq/barcoded_fluseq_pipeline.sh -i $prefix
 done < "$infile"
 	
