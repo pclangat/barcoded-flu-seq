@@ -66,10 +66,13 @@ def check_barcodes(reads_dict):
 			
 			## If intact rev barcode pattern, add barcode and associated sequences to barcodes dict
 			if intact_rev_barcode:
-				intact_barcoded_seqs += 1
-				print intact_rev_barcode
-				barcode = (intact_rev_barcode[0]).split(rev_primer)[1]
-				barcoded_seqs[barcode].append(oriented_sequence)				
+				try:
+					intact_barcoded_seqs += 1
+					#print intact_rev_barcode
+					barcode = (intact_rev_barcode[0]).split(rev_primer)[1]
+					barcoded_seqs[barcode].append(oriented_sequence)
+				except IndexError:
+					print intact_rev_barcode			
 		
 		'''for rev_primer in rev_primers:
 			pattern = rev_primer+'[A-Z]{4}A[A-Z]{4}A[A-Z]{4}A'
