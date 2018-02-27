@@ -260,7 +260,8 @@ with open(primer_file, 'r') as pfh:
 	for line in pfh:
 		rev_primer = line.strip()
 		print rev_primer
-pattern = rev_primer+'[A-Z]{4}A[A-Z]{4}A[A-Z]{4}A'
+#pattern = rev_primer+'[A-Z]{4}A[A-Z]{4}A[A-Z]{4}A'
+pattern = rev_primer+'[A-Z]{4}T[A-Z]{4}T[A-Z]{4}T'
 pattern = regex.compile('('+pattern+'){e<=2}')
 print("Rev primer: %s" % pattern)
 
