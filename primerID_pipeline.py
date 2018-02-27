@@ -262,7 +262,7 @@ with open(primer_file, 'r') as pfh:
 		print rev_primer
 #pattern = rev_primer+'[A-Z]{4}A[A-Z]{4}A[A-Z]{4}A'
 pattern = rev_primer+'T[A-Z]{4}T[A-Z]{4}T[A-Z]{4}'
-pattern = regex.compile('('+pattern+'){e<=2}')
+pattern = regex.compile('('+pattern+'){e<1}')
 print("Rev primer: %s" % pattern)
 
 ## Load reference fasta
