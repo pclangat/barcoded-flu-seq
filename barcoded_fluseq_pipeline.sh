@@ -107,8 +107,8 @@ quality=20
 pairedlength=600
 echo "[INFO 6]: Performing quality control using QUASR with -l $length -m $quality options:"
 #java -jar $quasr_path -i $prefix.assembled.fastq -o $prefix -q -l $length -m $quality -z -g -w $length -R $r_path 
-#java -jar $quasr_path -i $prefix.assembled.fastq -o $prefix -q -l $length -m $quality -g -w $pairedlength -R $r_path 
-java -jar $quasr_path -i $prefix.pair.fastq.gz -o $prefix -q -l $length -m $quality -g -w $pairedlength -R $r_path 
+java -jar $quasr_path -i $prefix.assembled.fastq -o $prefix -q -l $length -m $quality -g -w $pairedlength -R $r_path 
+#java -jar $quasr_path -i $prefix.pair.fastq.gz -o $prefix -q -l $length -m $quality -g -w $pairedlength -R $r_path 
 
 ##Check if QC worked
 #if [ -s $prefix.qc.fq.gz ]; then
