@@ -92,7 +92,7 @@ echo "[INFO 5b]: Pairing read files using PEAR."
 $pear_path -f $prefix$read1unzip -r $prefix$read2unzip -o $prefix
 
 ##Check if pairing worked
-#if [ -s $prefix.assembled.fastq ]; then
+if [ -s $prefix.assembled.fastq ]; then
 #if [ -s $prefix.pair.fastq.gz ]; then
 	echo -e "\t... Paired file found OK."
 else

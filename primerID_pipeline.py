@@ -252,8 +252,6 @@ signal.signal(signal.SIGALRM, timeout_handler)
 ## Barcode read multiplicity minimum
 min_barcode_count = 2
 
-fwd_primer = "CGGGGAAAATATGCAACAATCCT"
-
 ## Load reverse primer
 primer_file = '../primers.fas'
 with open(primer_file, 'r') as pfh:
