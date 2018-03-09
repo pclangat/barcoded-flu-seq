@@ -32,11 +32,17 @@ def get_reference(rfh):
 		seq = str(record.seq)
 	return seq
 
-def get_primers(pfh):
-	seqs = []
-	for record in SeqIO.parse(primers_file, 'fasta'):
-		seqs.append(str(record.seq))
-	return seqs
+def get_primers(primersfh):
+	## Open primers file
+	with open(primersfh, 'r') as pfh:
+	for line in pfh:
+		rev_primer = line.strip()
+		print rev_primer
+
+	## Make reverse primer shorter to account for trimming
+	rev_primer = rev_primer[-10:]
+	print "Will search only for last 10 nucleotides of rev primer: %s" % rev_primer
+	return rev_primer
 	
 def get_sample_reads(prfx):
 	#qc_paired_fastq = prfx+'.assembled.fastq.gz'
@@ -48,19 +54,23 @@ def get_sample_reads(prfx):
 	reads = SeqIO.index(qc_paired_fasta, 'fasta')
 	return reads
 
-def check_barcodes(reads_dict):
+def check_barcodes(reads_dict, rev_primer, bc_pattern):
 	matches = []
 	intact_barcoded_seqs = 0
 	barcoded_seqs = defaultdict(list)
 	
+	primer_pattern = rev_primer+bc_pattern
+	primer_pattern = regex.compile('('+primer_pattern+'){e<1}')
+	print("Barcoded rev primer: %s" % pattern)
+	
 	##For each read, look for reverse primer (either full or partial match)
 	for read in reads_dict:
 		sequence = reads_dict[read].seq
-		primer_pos, oriented_sequence, match_depth = check_rev_primer_match(rev_primer, sequence)
+		primer_pos, oriented_sequence, match_depth = check_rev_primer_match(primer_pattern, sequence)
 		matches.append(match_depth)
 		
 		## If rev primer sequence is found, check if intact rev barcode pattern exists
-		if primer_pos > 0:
+		if primer_pos > -1:
 			rev_primer_seq = oriented_sequence[primer_pos:]
 			intact_rev_barcode = regex.findall(pattern, str(rev_primer_seq))
 			
@@ -97,6 +107,7 @@ def check_rev_primer_match(r_primer, seq):
 	##if match found
 	if pos > -1:
 		match = 'full'
+		print pos
 	##if no match found
 	else:
 		##try reverse complement of sequence
@@ -107,6 +118,7 @@ def check_rev_primer_match(r_primer, seq):
 		if pos > -1:
 			seq = rc_seq
 			match = 'full'
+			print pos
 		else:
 			##if still no match, try searching for partial match
 			pos, seq, match = check_partial_rev_primer_match(r_primer, seq)
@@ -117,6 +129,7 @@ def check_partial_rev_primer_match(r_primer, seq):
 	match = 'none'
 	
 	pattern = '('+r_primer+'){e<=2}'
+	print pattern
 	#pattern = r_primer+'[A-Z]{4}A[A-Z]{4}A[A-Z]{4}A'
 	
 	#pattern = r_primer+'[A-Z]{4}A[A-Z]{4}A[A-Z]{4}A'
@@ -250,20 +263,13 @@ signal.signal(signal.SIGALRM, timeout_handler)
 
 ##These will become user-accepted later
 ## Barcode read multiplicity minimum
-min_barcode_count = 2
+min_barcode_count = 3
+bc_pattern = 'T[A-Z]{4}T[A-Z]{4}T[A-Z]{4}'
 
-## Load reverse primer
-primer_file = '../primers.fas'
-with open(primer_file, 'r') as pfh:
-	for line in pfh:
-		rev_primer = line.strip()
-		print rev_primer
-pattern = rev_primer+'[A-Z]{4}A[A-Z]{4}A[A-Z]{4}A'
-#pattern = rev_primer+'T[A-Z]{4}T[A-Z]{4}T[A-Z]{4}'
-pattern = regex.compile('('+pattern+'){e<=2}')
-print("Rev primer: %s" % pattern)
+## Designate reverse primer (should be the UNIVERSAL region of the primer in it)
+primers_file = '../primers.fas'
 
-## Load reference fasta
+## Designate reference fasta
 reference_file = '../reference.fas'
 
 		
@@ -276,24 +282,25 @@ if __name__ == '__main__':
 		print('[USAGE]: %s sample_prefix' % sys.argv[0] )
 		sys.exit(1)
 
-	###STEP 2: Load things and convert qc fastq files to fasta file 
+	###STEP 2: Load reference, primers, and convert qc fastq files to fasta file 
 	###and load records as dictionary index (i.e. does not save all into memory, good for large fastq files)
 	print "\n>>>BARCODE FILTERING & MOLECULAR COUNTING SUMMARY<<<"
 	sys.stdout.flush() 
 	
-	#print "[INFO]: Reading reference sequence..."
+	print "[INFO]: Reading reference sequence..."
 	reference_seq = get_reference(reference_file)
 	
-	#print "[INFO]: Reading reverse primers..."
-	#rev_primers = get_primers(primers_file)
-	#print "\t%s" % rev_primers
+	print "[INFO]: Reading reverse primers..."
+	rev_pattern = get_primers(primers_file)
 	
-	reads_dict = get_sample_reads(prefix)		
+	print "[INFO]: Loading sample reads..."
+	reads_dict = get_sample_reads(prefix)	
+		
 	print "[INFO]: Total input sequences (after pairing and QC): %s" % len(reads_dict)
 	sys.stdout.flush() 
 	
-	###STEP 3: Find reverse primer (gene portion) in read sequence, count whether full or partial or no match
-	matches, intact_barcoded_seqs, barcoded_seqs = check_barcodes(reads_dict)
+	###STEP 3: Find reverse primer pattern in read sequence, count whether full or partial or no match
+	matches, intact_barcoded_seqs, barcoded_seqs = check_barcodes(reads_dict, primer_pattern)
 	reads_dict.close()
 	m = len(matches) - matches.count('none')
 	percent_m = (m*100.0/len(matches))
@@ -339,7 +346,7 @@ if __name__ == '__main__':
 		# Start the timer. Once 5 seconds are over, a SIGALRM signal is sent.
 		signal.alarm(5)
 		try:
-			if barcode_count > min_barcode_count:
+			if barcode_count >= min_barcode_count:
 				barcodes_to_process_count += 1
 				i = 1
 				barcode_group_records = []
