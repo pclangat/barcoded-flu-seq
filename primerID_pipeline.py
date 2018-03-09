@@ -10,7 +10,7 @@ requires biopython: pip install biopython
 requires regex: pip install regex'''
 
 ##Import modules
-import sys, os, regex, subprocess, operator, signal
+import sys, os, re, regex, subprocess, operator, signal
 
 from collections import defaultdict
 from Bio import SeqIO, AlignIO
@@ -35,9 +35,9 @@ def get_reference(rfh):
 def get_primers(primersfh):
 	## Open primers file
 	with open(primersfh, 'r') as pfh:
-	for line in pfh:
-		rev_primer = line.strip()
-		print rev_primer
+		for line in pfh:
+			rev_primer = line.strip()
+			print rev_primer
 
 	## Make reverse primer shorter to account for trimming
 	rev_primer = rev_primer[-10:]
@@ -47,42 +47,60 @@ def get_primers(primersfh):
 def get_sample_reads(prfx):
 	#qc_paired_fastq = prfx+'.assembled.fastq.gz'
 	#qc_paired_fastq = prfx+'.qc.fq.gz'
-	qc_paired_fastq = prfx+'.qc.fq'
+	#temp-change qc_paired_fastq = prfx+'.qc.fq'
 	qc_paired_fasta = prfx+'.qc_paired_reads.fas'
 	
-	SeqIO.convert(qc_paired_fastq, "fastq", qc_paired_fasta, "fasta")
+	#temp-changeSeqIO.convert(qc_paired_fastq, "fastq", qc_paired_fasta, "fasta")
 	reads = SeqIO.index(qc_paired_fasta, 'fasta')
 	return reads
 
 def check_barcodes(reads_dict, rev_primer, bc_pattern):
-	matches = []
+	match_types = []
 	intact_barcoded_seqs = 0
 	barcoded_seqs = defaultdict(list)
-	
 	primer_pattern = rev_primer+bc_pattern
-	primer_pattern = regex.compile('('+primer_pattern+'){e<1}')
-	print("Barcoded rev primer: %s" % pattern)
+	print("Barcoded rev primer: %s" % primer_pattern)
 	
 	##For each read, look for reverse primer (either full or partial match)
 	for read in reads_dict:
 		sequence = reads_dict[read].seq
-		primer_pos, oriented_sequence, match_depth = check_rev_primer_match(primer_pattern, sequence)
-		matches.append(match_depth)
+		match_result, oriented_sequence, match_depth = check_rev_primer_match(primer_pattern, sequence)
+		match_types.append(match_depth)
 		
 		## If rev primer sequence is found, check if intact rev barcode pattern exists
-		if primer_pos > -1:
-			rev_primer_seq = oriented_sequence[primer_pos:]
-			intact_rev_barcode = regex.findall(pattern, str(rev_primer_seq))
+		if match_result:
+			pattern_start = match_result.start()
+			pattern_end = match_result.end()
+			bc_start = pattern_start + len(rev_primer)
+			
+			# find whole rev primer seq
+			pattern_seq = oriented_sequence[:pattern_end]
+			#print pattern_seq
+			
+			# find barcode
+			barcode = oriented_sequence[bc_start:pattern_end]
+			#print barcode
+			intact_barcoded_seqs +=1
+			
+			# get seq without barcode
+			trimmed_sequence = oriented_sequence[pattern_end:]
+			#print trimmed_sequence
+			
+			barcoded_seqs[barcode].append(trimmed_sequence)
+			
+			#rt_primer_seq = oriented_sequence[:match_result.end()]
+			#rev_primer_seq = oriented_sequence[primer_pos:]
+			#intact_rev_barcode = regex.findall(pattern, str(rev_primer_seq))
 			
 			## If intact rev barcode pattern, add barcode and associated sequences to barcodes dict
-			if intact_rev_barcode:
-				try:
-					intact_barcoded_seqs += 1
-					#print intact_rev_barcode
-					barcode = (intact_rev_barcode[0]).split(rev_primer)[1]
-					barcoded_seqs[barcode].append(oriented_sequence)
-				except IndexError:
-					print intact_rev_barcode			
+			#if intact_rev_barcode:
+			#	try:
+			#		intact_barcoded_seqs += 1
+			#		#print intact_rev_barcode
+			#		barcode = (intact_rev_barcode[0]).split(rev_primer)[1]
+			#		barcoded_seqs[barcode].append(oriented_sequence)
+			#	except IndexError:
+			#		print intact_rev_barcode			
 		
 		'''for rev_primer in rev_primers:
 			pattern = rev_primer+'[A-Z]{4}A[A-Z]{4}A[A-Z]{4}A'
@@ -98,39 +116,40 @@ def check_barcodes(reads_dict, rev_primer, bc_pattern):
 				barcoded_seqs[barcode].append(oriented_sequence)
 				break
 		matches.append(match_depth)'''
-	return matches, intact_barcoded_seqs, barcoded_seqs
+	return match_types, intact_barcoded_seqs, barcoded_seqs
 
-def check_rev_primer_match(r_primer, seq):
+def check_rev_primer_match(pattern, seq):
 	match = 'none'
-	pos = seq.find(r_primer)
+	#primer_pattern = regex.compile('('+primer_pattern+'){e<1}')
+	#print primer_pattern
+	full_match = re.search(pattern, str(seq))
 	
 	##if match found
-	if pos > -1:
+	if full_match:
 		match = 'full'
-		print pos
+		#print full_match.start()
+		#print full_match.end()
 	##if no match found
 	else:
 		##try reverse complement of sequence
 		rc_seq = seq.reverse_complement()
-		pos = rc_seq.find(r_primer)
+		full_match = re.search(pattern, str(rc_seq))
 		
 		##if match, re-orient sequence
-		if pos > -1:
+		if full_match:
 			seq = rc_seq
 			match = 'full'
-			print pos
-		else:
+			#print full_match.start()
+			#print full_match.end()
+		#else:
 			##if still no match, try searching for partial match
-			pos, seq, match = check_partial_rev_primer_match(r_primer, seq)
-	return pos, seq, match
+			#partial_match, seq, match = check_partial_rev_primer_match(pattern, seq)
+			#full_match = partial_match
+	return full_match, seq, match
 
 def check_partial_rev_primer_match(r_primer, seq):
-	pos = -1
 	match = 'none'
-	
 	pattern = '('+r_primer+'){e<=2}'
-	print pattern
-	#pattern = r_primer+'[A-Z]{4}A[A-Z]{4}A[A-Z]{4}A'
 	
 	#pattern = r_primer+'[A-Z]{4}A[A-Z]{4}A[A-Z]{4}A'
 	#pattern = regex.compile('('+pattern+'){e<=1}')
@@ -143,7 +162,8 @@ def check_partial_rev_primer_match(r_primer, seq):
 	##if partial match found
 	if fuzzy_match:
 		match = 'partial'
-		pos = fuzzy_match.span()[1]
+		#pos = fuzzy_match.span()[1]
+		print fuzzy_match.span()
 	##if no partial match found
 	else:
 		##try reverse complement of sequence
@@ -154,8 +174,9 @@ def check_partial_rev_primer_match(r_primer, seq):
 		if fuzzy_match:
 			seq = rc_seq
 			match = 'partial'
-			pos = fuzzy_match.span()[1]
-	return pos, seq, match
+			#pos = fuzzy_match.span()[1]
+			print fuzzy_match.span()
+	return fuzzy_match, seq, match
 	
 '''def check_rev_primer_match(r_primer, seq):
 	match = 'none'
@@ -255,7 +276,9 @@ def generate_consensus(alignment):
 				
 ###INITIALISATIONS
 ##Paths to software
-muscle_path = '/software/CGP/external-apps/muscle3.8.31_i86linux64/muscle3.8.31_i86linux64'
+#muscle_path = '/software/CGP/external-apps/muscle3.8.31_i86linux64/muscle3.8.31_i86linux64'
+#temp-change: testing locally on computer
+muscle_path = '/Users/pclangat/Software/muscle/muscle3.8.31_i86darwin32'
 muscle_cline = MuscleCommandline(muscle_path)
 
 ##Set SIGALRM
@@ -291,27 +314,27 @@ if __name__ == '__main__':
 	reference_seq = get_reference(reference_file)
 	
 	print "[INFO]: Reading reverse primers..."
-	rev_pattern = get_primers(primers_file)
+	rev_primer = get_primers(primers_file)
 	
 	print "[INFO]: Loading sample reads..."
 	reads_dict = get_sample_reads(prefix)	
 		
 	print "[INFO]: Total input sequences (after pairing and QC): %s" % len(reads_dict)
 	sys.stdout.flush() 
-	
+
 	###STEP 3: Find reverse primer pattern in read sequence, count whether full or partial or no match
-	matches, intact_barcoded_seqs, barcoded_seqs = check_barcodes(reads_dict, primer_pattern)
+	matches, intact_bc_seqs_count, barcoded_seqs = check_barcodes(reads_dict, rev_primer, bc_pattern)
 	reads_dict.close()
 	m = len(matches) - matches.count('none')
 	percent_m = (m*100.0/len(matches))
-	percent_i = (intact_barcoded_seqs*100.0/m)
-	percent_b = (len(barcoded_seqs)*100.0/intact_barcoded_seqs)
+	percent_i = (intact_bc_seqs_count*100.0/m)
+	percent_b = (len(barcoded_seqs)*100.0/intact_bc_seqs_count)
 	
 	print "[INFO]: Sequences with reverse primer region: %s (%.1f%%)" % (m, percent_m)
 	print "... Full matches to reverse primer: %s" % matches.count('full')
 	print "... Partial matches to reverse primer: %s" % matches.count('partial')
 	print "... Reverse primer not found: %s" % matches.count('none')
-	print "[INFO]: Sequences with intact barcodes: %s (%.1f%%)" % (intact_barcoded_seqs, percent_i)
+	print "[INFO]: Sequences with intact barcodes: %s (%.1f%%)" % (intact_bc_seqs_count, percent_i)
 	print "... Representing # of unique barcodes: %s (%.1f%%)" % (len(barcoded_seqs), percent_b)
 	sys.stdout.flush() 
 	sum = 0
