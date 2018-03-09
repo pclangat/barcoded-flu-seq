@@ -47,10 +47,10 @@ def get_primers(primersfh):
 def get_sample_reads(prfx):
 	#qc_paired_fastq = prfx+'.assembled.fastq.gz'
 	#qc_paired_fastq = prfx+'.qc.fq.gz'
-	#temp-change qc_paired_fastq = prfx+'.qc.fq'
+	qc_paired_fastq = prfx+'.qc.fq'
 	qc_paired_fasta = prfx+'.qc_paired_reads.fas'
 	
-	#temp-changeSeqIO.convert(qc_paired_fastq, "fastq", qc_paired_fasta, "fasta")
+	SeqIO.convert(qc_paired_fastq, "fastq", qc_paired_fasta, "fasta")
 	reads = SeqIO.index(qc_paired_fasta, 'fasta')
 	return reads
 
@@ -276,9 +276,9 @@ def generate_consensus(alignment):
 				
 ###INITIALISATIONS
 ##Paths to software
-#muscle_path = '/software/CGP/external-apps/muscle3.8.31_i86linux64/muscle3.8.31_i86linux64'
+muscle_path = '/software/CGP/external-apps/muscle3.8.31_i86linux64/muscle3.8.31_i86linux64'
 #temp-change: testing locally on computer
-muscle_path = '/Users/pclangat/Software/muscle/muscle3.8.31_i86darwin32'
+#muscle_path = '/Users/pclangat/Software/muscle/muscle3.8.31_i86darwin32'
 muscle_cline = MuscleCommandline(muscle_path)
 
 ##Set SIGALRM
