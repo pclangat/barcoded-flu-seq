@@ -81,7 +81,7 @@ fi
 echo "[INFO 4]: Initial quality check of reads using QUASR."
 #java -jar $quasr_path -i $prefix$read1 -o $prefix$r1 -g -w 300 -R $r_path
 #java -jar $quasr_path -i $prefix$read2 -o $prefix$r2 -g -w 300 -R $r_path 
-"...currently skipping this step."
+echo "...currently skipping this step."
 
 ##Unzip fastq files
 echo "[INFO 5a]: Gunzipping fastq read files."
