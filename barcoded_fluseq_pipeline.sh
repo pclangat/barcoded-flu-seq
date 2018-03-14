@@ -79,8 +79,9 @@ fi
 
 ##Initial quality check
 echo "[INFO 4]: Initial quality check of reads using QUASR."
-java -jar $quasr_path -i $prefix$read1 -o $prefix$r1 -g -w 300 -R $r_path
-java -jar $quasr_path -i $prefix$read2 -o $prefix$r2 -g -w 300 -R $r_path 
+#java -jar $quasr_path -i $prefix$read1 -o $prefix$r1 -g -w 300 -R $r_path
+#java -jar $quasr_path -i $prefix$read2 -o $prefix$r2 -g -w 300 -R $r_path 
+"...currently skipping this step."
 
 ##Unzip fastq files
 echo "[INFO 5a]: Gunzipping fastq read files."
@@ -101,15 +102,15 @@ else
 fi 
 
 ##Run QC on paired fastq
-##Set min length, phred quality, and expected paired reads lenght
-length=250
+##Set min length, phred quality, and expected paired reads length
+length=300
 quality=20
 pairedlength=600
 echo "[INFO 6]: Performing quality control using QUASR with -l $length -m $quality options:"
 #java -jar $quasr_path -i $prefix.assembled.fastq -o $prefix -q -l $length -m $quality -z -g -w $length -R $r_path
 #java -jar $quasr_path -i $prefix.pair.fastq.gz -o $prefix -q -l $length -m $quality -g -w $pairedlength -R $r_path  
 #java -jar $quasr_path -i $prefix.assembled.fastq -o $prefix -q -l $length -m $quality -g -w $pairedlength -R $r_path
-java -jar $quasr_path -i $prefix.assembled.fastq -o $prefix -q -l $length -m $quality -g -w $pairedlength
+java -jar $quasr_path -i $prefix.assembled.fastq -o $prefix -q -l $length -m $quality
  
 ##Check if QC worked
 #if [ -s $prefix.qc.fq.gz ]; then
