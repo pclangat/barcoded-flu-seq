@@ -16,7 +16,7 @@ def get_bcprimer(rev_primer):
 	return pattern
 
 def trim_bcprimers(records, adaptor):
-	len_adaptor = len(adaptor)
+	trim_count = 0
 	for record in records:
 		seq = str(record.seq)
 		match_result = re.search(adaptor, seq)
@@ -36,6 +36,7 @@ def trim_bcprimers(records, adaptor):
 				adaptor_end = match_result.end()
 				og_len = len(rc_record.seq)
 				trim_len = len(rc_record[adaptor_end:].seq)
+				trim_count+=1
 				print("%s->%s" % (og_len, trim_len))
 				yield rc_record[adaptor_end:]
 		else:
@@ -43,9 +44,12 @@ def trim_bcprimers(records, adaptor):
 			adaptor_end = match_result.end()
 			og_len = len(record.seq)
 			trim_len = len(record[adaptor_end:].seq)
+			trim_count+=1
 			print("%s->%s" % (og_len, trim_len))
-			yield record[adaptor_end:]		
-	
+			yield record[adaptor_end:]
+	print("Trimmed %i reads." % trim_count)		
+
+trim_count = 0	
 ###MAIN
 if __name__ == '__main__':
 	##STEP 1: Parse user input
