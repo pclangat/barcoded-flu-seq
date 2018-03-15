@@ -4,7 +4,7 @@
 ## accepts fastq and trims barcode region, outputs barcode-trimmed 
 
 from Bio import SeqIO
-import re
+import sys, re
 
 def get_primer():
 	#uniX: rev_primer = 'TGCGTTGATACCACTGCTT'
