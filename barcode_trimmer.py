@@ -6,10 +6,7 @@
 from Bio import SeqIO
 import sys, re
 
-def get_primer():
-	#uniX: rev_primer = 'TGCGTTGATACCACTGCTT'
-	#uniY: rev_primer = 'TGTCCAGCACGCTTCAGGC'
-	rev_primer = 'TGTCCAGCACGCTTCAGGC'
+def get_bcprimer(rev_primer):
 	## Make reverse primer shorter to account for trimming
 	rev_primer = rev_primer[-10:]
 	bc_pattern = 'T[A-Z]{4}T[A-Z]{4}T[A-Z]{4}'
@@ -32,6 +29,7 @@ def trim_bcprimers(records, adaptor):
 			seq = str(rc_record.seq)
 			match_result = re.search(adaptor, seq)
 			if not match_result:
+				print "..."
 				yield record
 			else:
 				#trim off adaptor from rc
@@ -60,9 +58,16 @@ if __name__ == '__main__':
 	print "[INFO]: Loading sample reads..."
 	original_reads = SeqIO.parse('%s.qc.fq' % prefix, 'fastq')
 	
-	##STEP 2: Load BC primer sequence
-	primer_pattern = get_primer()
+	##STEP 2: Load BC primer sequences
+	uni_x = 'TGCGTTGATACCACTGCTT'
+	uni_y = 'TGTCCAGCACGCTTCAGGC'
+	primer_pattern = get_bcprimer(uni_x)
+	primer_pattern2 = get_bcprimer(uni_y)
 	
+	##STEP 3: Trim the adaptors off the reads
 	trimmed_reads = trim_bcprimers(original_reads, primer_pattern)
-	count = SeqIO.write(trimmed_reads, '%s.barcode_trimmed.qc.fq' % prefix, 'fastq')
+	double_trimmed_reads = trim_bcprimers(trimmed_reads, primer_pattern2)
+	
+	##STEP 4: Write trimmed reads to fastq file
+	count = SeqIO.write(double_trimmed_reads, '%s.barcode_trimmed.qc.fq' % prefix, 'fastq')
 	print("Saved %i reads." % count)
