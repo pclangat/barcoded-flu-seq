@@ -27,6 +27,8 @@ def trim_bcprimers(records, adaptor):
 		if not match_result:
 			#adaptor not found, try reverse complement
 			rc_record = record.reverse_complement()
+			rc_record.id = record.id
+			rc_record.description = record.description
 			seq = str(rc_record.seq)
 			match_result = re.search(adaptor, seq)
 			if not match_result:
@@ -34,10 +36,16 @@ def trim_bcprimers(records, adaptor):
 			else:
 				#trim off adaptor from rc
 				adaptor_end = match_result.end()
+				og_len = len(rc_record.seq)
+				trim_len = len(rc_record[adaptor_end:].seq)
+				print("%s->%s" % (og_len, trim_len))
 				yield rc_record[adaptor_end:]
 		else:
 			#trim off adaptor
 			adaptor_end = match_result.end()
+			og_len = len(record.seq)
+			trim_len = len(record[adaptor_end:].seq)
+			print("%s->%s" % (og_len, trim_len))
 			yield record[adaptor_end:]		
 	
 ###MAIN
@@ -56,5 +64,5 @@ if __name__ == '__main__':
 	primer_pattern = get_primer()
 	
 	trimmed_reads = trim_bcprimers(original_reads, primer_pattern)
-	count = SeqIO.write(trimmed_reads, '%s.barcode_trimmed.qc.fq', 'fastq')
+	count = SeqIO.write(trimmed_reads, '%s.barcode_trimmed.qc.fq' % prefix, 'fastq')
 	print("Saved %i reads." % count)
