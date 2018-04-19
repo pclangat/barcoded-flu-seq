@@ -42,38 +42,17 @@ fi
 ##Sample path
 sample_path="${PWD}/$prefix/"
 
-##Create directory with prefix name if it doesn't already exist, move files into it, move into it
-echo "[INFO 1]: Creating directory for sample '$prefix'."
-mkdir -p $sample_path
-
-echo "[INFO 2]: Copying sample files into sample directory."
-for i in `ls ${PWD}/$prefix*`;
-do
-	test -f $i && echo -e "\t... $i" && cp $i $sample_path/
-done
-
-echo "[INFO 3]: Checking sample directory for read files."
+echo "[INFO]: Checking sample directory for read files."
 cd $sample_path
 
 ##Get fastq read files
-read1="_R1_001.fastq.gz"
-read2="_R2_001.fastq.gz"
-read1unzip="_R1_001.fastq"
-read2unzip="_R2_001.fastq"
-r1="_R1"
-r2="_R2"
-qc1=".qc.f.fq.gz"
-qc2=".qc.r.fq.gz"
+reads=".fastq"
 
-if [ -f $prefix$read1 ]; then
-	echo -e "\t... Found read1 '$prefix$read1'"
-	if [ -f $prefix$read2 ]; then
-		echo -e "\t... Found read2 '$prefix$read2'"
-	else
-		echo "[ERROR]: Read2 '$prefix$read2' not found."
-	fi
+if [ -f *$reads ]; then
+	echo -e "\t... Found basecalled reads."
+	
 else
-	echo "[ERROR]: Read1 '$prefix$read1' not found."
+	echo "[ERROR]: Reads not found."
 	exit 1
 fi
 

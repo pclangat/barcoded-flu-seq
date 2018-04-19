@@ -1,5 +1,5 @@
 #!/usr/bin/python
-## ~/scripts/primerID_pipeline.py <sample_name>
+## ~/scripts/barcoded-flu-seq/primerID_pipeline.py <sample_name>
 
 ## Takes as input the sample name
 ## STEP ONE: 
@@ -10,7 +10,7 @@ requires biopython: pip install biopython
 requires regex: pip install regex'''
 
 ##Import modules
-import sys, os, re, regex, subprocess, operator, signal
+import sys, os, re, subprocess, operator, signal, glob
 
 from collections import defaultdict
 from Bio import SeqIO, AlignIO
@@ -45,13 +45,14 @@ def get_primers(primersfh):
 	return rev_primer
 	
 def get_sample_reads(prfx):
-	#qc_paired_fastq = prfx+'.assembled.fastq.gz'
-	#qc_paired_fastq = prfx+'.qc.fq.gz'
-	qc_paired_fastq = prfx+'.qc.fq'
-	qc_paired_fasta = prfx+'.qc_paired_reads.fas'
+	os.chdir(prfx)
+	for file in glob.glob('*.fastq'):
+		print "Found reads file: %s." % file
+		basecalled_fastq = file
+	basecalled_fasta = prfx+'.basecalled.fas'
 	
-	SeqIO.convert(qc_paired_fastq, "fastq", qc_paired_fasta, "fasta")
-	reads = SeqIO.index(qc_paired_fasta, 'fasta')
+	SeqIO.convert(basecalled_fastq, "fastq", basecalled_fasta, "fasta")
+	reads = SeqIO.index(basecalled_fasta, 'fasta')
 	return reads
 
 def check_barcodes(reads_dict, rev_primer, bc_pattern):
@@ -157,8 +158,9 @@ def check_partial_rev_primer_match(r_primer, seq):
 	#pattern = '('+r_primer+'){e<=2}'
 	#print pattern 
 	
-	fuzzy_match = regex.search(pattern, str(seq), regex.BESTMATCH)
-	
+	#fuzzy_match = regex.search(pattern, str(seq), regex.BESTMATCH)
+	fuzzy_match = re.search(pattern, str(seq), re.BESTMATCH)
+
 	##if partial match found
 	if fuzzy_match:
 		match = 'partial'
@@ -168,7 +170,8 @@ def check_partial_rev_primer_match(r_primer, seq):
 	else:
 		##try reverse complement of sequence
 		rc_seq = seq.reverse_complement()
-		fuzz_match = regex.search(pattern, str(rc_seq), regex.BESTMATCH)
+		#fuzz_match = regex.search(pattern, str(rc_seq), regex.BESTMATCH)
+		fuzz_match = re.search(pattern, str(rc_seq), re.BESTMATCH)
 		
 		##if partial match, re-orient sequence:
 		if fuzzy_match:
@@ -276,9 +279,9 @@ def generate_consensus(alignment):
 				
 ###INITIALISATIONS
 ##Paths to software
-muscle_path = '/software/CGP/external-apps/muscle3.8.31_i86linux64/muscle3.8.31_i86linux64'
+#muscle_path = '/software/CGP/external-apps/muscle3.8.31_i86linux64/muscle3.8.31_i86linux64'
 #temp-change: testing locally on computer
-#muscle_path = '/Users/pclangat/Software/muscle/muscle3.8.31_i86darwin32'
+muscle_path = '/Users/pclangat/Software/muscle/muscle3.8.31_i86darwin32'
 muscle_cline = MuscleCommandline(muscle_path)
 
 ##Set SIGALRM
@@ -290,10 +293,10 @@ min_barcode_count = 3
 bc_pattern = 'T[A-Z]{4}T[A-Z]{4}T[A-Z]{4}'
 
 ## Designate reverse primer (should be the UNIVERSAL region of the primer in it)
-primers_file = '../primers.fas'
+primers_file = 'primers.txt'
 
 ## Designate reference fasta
-reference_file = '../reference.fas'
+reference_file = 'reference.fas'
 
 		
 ###MAIN
