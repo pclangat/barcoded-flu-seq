@@ -10,7 +10,7 @@ requires biopython: pip install biopython
 requires regex: pip install regex'''
 
 ##Import modules
-import sys, os, re, subprocess, operator, signal, glob
+import sys, os, re, regex, subprocess, operator, signal, glob
 
 from collections import defaultdict
 from Bio import SeqIO, AlignIO
@@ -142,10 +142,10 @@ def check_rev_primer_match(pattern, seq):
 			match = 'full'
 			#print full_match.start()
 			#print full_match.end()
-		#else:
+		else:
 			##if still no match, try searching for partial match
-			#partial_match, seq, match = check_partial_rev_primer_match(pattern, seq)
-			#full_match = partial_match
+			partial_match, seq, match = check_partial_rev_primer_match(pattern, seq)
+			full_match = partial_match
 	return full_match, seq, match
 
 def check_partial_rev_primer_match(r_primer, seq):
@@ -158,8 +158,8 @@ def check_partial_rev_primer_match(r_primer, seq):
 	#pattern = '('+r_primer+'){e<=2}'
 	#print pattern 
 	
-	#fuzzy_match = regex.search(pattern, str(seq), regex.BESTMATCH)
-	fuzzy_match = re.search(pattern, str(seq), re.BESTMATCH)
+	fuzzy_match = regex.search(pattern, str(seq), regex.BESTMATCH)
+	#fuzzy_match = re.search(pattern, str(seq), re.BESTMATCH)
 
 	##if partial match found
 	if fuzzy_match:
@@ -170,8 +170,8 @@ def check_partial_rev_primer_match(r_primer, seq):
 	else:
 		##try reverse complement of sequence
 		rc_seq = seq.reverse_complement()
-		#fuzz_match = regex.search(pattern, str(rc_seq), regex.BESTMATCH)
-		fuzz_match = re.search(pattern, str(rc_seq), re.BESTMATCH)
+		fuzz_match = regex.search(pattern, str(rc_seq), regex.BESTMATCH)
+		#fuzz_match = re.search(pattern, str(rc_seq), re.BESTMATCH)
 		
 		##if partial match, re-orient sequence:
 		if fuzzy_match:
@@ -322,7 +322,7 @@ if __name__ == '__main__':
 	print "[INFO]: Loading sample reads..."
 	reads_dict = get_sample_reads(prefix)	
 		
-	print "[INFO]: Total input sequences (after pairing and QC): %s" % len(reads_dict)
+	print "[INFO]: Total input sequences: %s" % len(reads_dict)
 	sys.stdout.flush() 
 
 	###STEP 3: Find reverse primer pattern in read sequence, count whether full or partial or no match
