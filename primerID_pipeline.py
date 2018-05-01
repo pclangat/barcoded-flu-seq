@@ -271,7 +271,8 @@ def get_alignment(records):
 
 def generate_consensus(alignment):
 	align_summary = AlignInfo.SummaryInfo(alignment)
-	consensus = align_summary.dumb_consensus(threshold=0.51, ambiguous='N')
+	#consensus = align_summary.dumb_consensus(threshold=0.51, ambiguous='N')
+	consensus = align_summary.gap_consensus(threshold=0.51, ambiguous='N')
 	return consensus
 				
 ###INITIALISATIONS
