@@ -274,6 +274,19 @@ def generate_consensus(alignment):
 	#consensus = align_summary.dumb_consensus(threshold=0.51, ambiguous='N')
 	consensus = align_summary.gap_consensus(threshold=0.51, ambiguous='N')
 	return consensus
+
+def calculate_cut_off(m):
+	## m is the maximum abundance of reads/PrimerID in the library
+	## n is the calculated cutoff based on Swanstrom's model
+	n = 0
+	if m<10:
+		n = 2
+	elif m<=8500:
+		n = (-1.24*10**-21*m**6) + (3.53*10**-17*m**5) - (3.90*10**-13*m**4) + (2.12*10**-9*m**3) - (6.06*10**-6*m**2) + (0.018*m) + 3.15
+	else:
+		n = 0.0079*m + 9.4869
+	n = n+1
+	return n
 				
 ###INITIALISATIONS
 ##Paths to software
