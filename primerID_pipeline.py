@@ -276,8 +276,8 @@ def generate_consensus(alignment):
 	return consensus
 
 def calculate_cut_off(m):
-	## m is the maximum abundance of reads/PrimerID in the library
-	## n is the calculated cutoff based on Swanstrom's model
+	'''m is the maximum abundance of reads/PrimerID in the library
+	n is the calculated cutoff based on Swanstrom's model'''
 	n = 0
 	if m<10:
 		n = 2
