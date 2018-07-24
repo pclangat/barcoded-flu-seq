@@ -300,7 +300,8 @@ signal.signal(signal.SIGALRM, timeout_handler)
 
 ##These will become user-accepted later
 ## Barcode read multiplicity minimum
-min_barcode_count = 3
+min_barcode_count = 2
+max_barcode_count = 100
 bc_pattern = 'T[A-Z]{4}T[A-Z]{4}T[A-Z]{4}'
 
 ## Designate reverse primer (should be the UNIVERSAL region of the primer in it)
@@ -383,7 +384,7 @@ if __name__ == '__main__':
 		# Start the timer. Once 5 seconds are over, a SIGALRM signal is sent.
 		signal.alarm(5)
 		try:
-			if barcode_count >= min_barcode_count:
+			if min_barcode_count < barcode_count < max_barcode_count:
 				barcodes_to_process_count += 1
 				i = 1
 				barcode_group_records = []
@@ -467,10 +468,12 @@ if __name__ == '__main__':
 			if not is_substring:	
 				unique_sequences[seq] = 1
 	
-	confident_unique_seqs = list(k for k, v in unique_sequences.items() if v > 1)
+	#confident_unique_seqs = list(k for k, v in unique_sequences.items() if v > 1)
+	confident_unique_seqs = list(k for k, v in unique_sequences.items() if v > 0)
 	
 	print "... Total unique sequence variants: %s" % len(unique_sequences)
-	print "... Unique sequence variants associated with >1 template molecules: %s" % len(confident_unique_seqs) 
+	#print "... Unique sequence variants associated with >1 template molecules: %s" % len(confident_unique_seqs) 
+	print "... Unique sequence variants associated with all primerID-corrected template molecules: %s" % len(confident_unique_seqs) 
 	
 	###STEP 6: Name and align sequences, generate fasta output
 	print "[INFO]: Creating output fasta '%s.unique_sequences.fas' of aligned unique sequence variants with headers '>Sample_Name-#AssociatedTemplates'" % prefix
